@@ -23,7 +23,7 @@ class Env:
 
     def reset(self,
               start: ArrayLike,
-              goal: ArrayLike):
+              goal: ArrayLike) -> tuple[Array, Array, Array]:
         veh_corners = jnp.array(object=[[start[0] - self.lh, start[1] - self.wh],
                                         [start[0] + self.lh, start[1] - self.wh],
                                         [start[0] + self.lh, start[1] + self.wh],
