@@ -25,7 +25,7 @@ class FishBoat:
                  control_horizon: int) -> None:
         
         self.timesteps = timesteps
-        self.lh, self.lw = vehicle_l / 2.0, vehicle_w / 2.0   # vehicle half-dims
+        self.lh, self.lw = vehicle_l / 2.0, vehicle_w / 2.0 
         self.cam_range = cam_range
         self.fov_half = np.deg2rad(fov_deg) / 2.0
         self.v_max, self.w_max = v_max, w_max
@@ -35,7 +35,7 @@ class FishBoat:
  
         self.start_state = start_state.astype(float)
         self.goal_state = goal_state.astype(float)
-        self.obstacle_locs = obstacle_locs.astype(float)   # rows: [x, y, w, h]
+        self.obstacle_locs = obstacle_locs.astype(float)   # [x, y, w, h]
         self.control_horizon = control_horizon
         self.dt = 0.1
  
@@ -111,8 +111,9 @@ class FishBoat:
                     cost += self.W_SLACK*s**2
                     for v in vv:
                         opti.subject_to(ca.dot(a, v) <= b)
-                    for w in active[m]:
-                        opti.subject_to(ca.dot(a, ca.DM(w)) >= b + self.D_MIN - s)
+                        print("a, v: ",a, v)
+                    for o in active[m]:
+                        opti.subject_to(ca.dot(a, ca.DM(o)) >= b + self.D_MIN - s)
                     opti.subject_to(ca.dot(a, a) <= 1)
                     opti.subject_to(s >= 0)
         
@@ -256,20 +257,20 @@ def main():
     fov_deg = 90.0
 
     v_max = 2.0
-    w_max = 1.5
+    w_max = 5.0
 
     map_dim = 50
     safe_dist = 2.0
 
 
     start_state = np.array([5.0, 5.0, np.pi/4])
-    goal_state = np.array([47.0, 20.0, 0.0])
-    obstacle_locs = np.array([[40.0, 20.0, 5.0, 10.0],
+    goal_state = np.array([45.0, 45.0, 0.0])
+    obstacle_locs = np.array([[10.0, 20.0, 5.0, 10.0],
                                 [22.0, 26.0, 4.0, 10.0],
                                 [31.0, 28.0, 8.0, 4.0],
                                 [38.0, 39.0, 5.0, 5.0]]) # define obstacles centers with width and height; [x, y, width, height]
     
-    control_horizon = 10
+    control_horizon = 30
 
     boat = FishBoat(timesteps=total_timsteps,
                     vehicle_l=vehicle_l,
