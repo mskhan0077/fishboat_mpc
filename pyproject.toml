@@ -8,4 +8,5 @@ dependencies = [
     "casadi>=3.7.2",
     "jax[cuda13]>=0.10.2",
     "matplotlib>=3.11.0",
+    "pandas>=3.0.3",
 ]
