@@ -9,7 +9,7 @@ from dynamics import unicycle_ext
 
 class P:
     dt = 0.2
-    T = 30
+    T = 50
     K = 2000
     temp = 1.0
     tau_u = 0.8
@@ -18,16 +18,16 @@ class P:
     r_min, r_max = -0.9, 0.9
     sig_u = 1.2
     sig_r = 2.0
-    w_goal = 4.0
+    w_goal = 1.0
     w_term = 30.0
     w_obs = 120.0
     w_ctrl = 0.02
     w_rate = 0.05
-    max_range = 9.0
-    half_fov = jnp.deg2rad(45)
+    max_range = 16.0
+    half_fov = jnp.deg2rad(40)
     hull_r = 0.4
     inflation = 0.45
-    unknown_cost = 0.1
+    unknown_cost = 0.001
 
 
 # ---- pure rollout (uses module constants, no env object -> jittable) ----
@@ -118,8 +118,12 @@ def main():
 
     r_obs_locs = jnp.array([[10.0, 20.0, 2.5, 5.0, 0.0],
                             [22.0, 10.0, 4.0, 6.0, 0.0],
-                            [31.0, 28.0, 8.0, 2.0, 0.0],
-                            [38.0, 45.0, 2.5, 2.5, 0.0]])
+                            [35.0, 35.0, 10.0, 2.0, 0.0],
+                            [38.0, 45.0, 2.5, 2.5, 0.0],
+                            [env_dim/2, 0.0, env_dim/2, 0.0, 0.0],
+                            [env_dim/2, env_dim, env_dim/2, 0.0, 0.0],
+                            [0.0, env_dim/2, 0.0, env_dim/2, 0.0],
+                            [50.0, env_dim/2, 0.0, env_dim/2, 0.0]])
 
     env = Env(env_dim=env_dim, dt=P.dt, hull_radius=P.hull_r, inflation=P.inflation,
               cam_range=P.max_range, fov_deg=P.half_fov, r_obs_locs=r_obs_locs)
