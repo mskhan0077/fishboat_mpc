@@ -15,7 +15,6 @@ class Env:
                  inflation: float,
                  cam_range: float,
                  fov_deg: float,
-                 goal_tol: float,
                  r_obs_locs: ArrayLike) -> None:
         self.env_dim = env_dim
         self.dt = dt
@@ -24,7 +23,6 @@ class Env:
         self.inflation = inflation
         self.cam_range = cam_range
         self.fov_deg = fov_deg
-        self.goal_tol = goal_tol
 
         self.r_obs = r_obs_locs
 
@@ -52,13 +50,6 @@ class Env:
         
         return start_state, goal_state
 
-
-    def dynamics(self,
-                 x: ArrayLike,
-                 u: ArrayLike) -> Array:
-        return jnp.array([u[0] * math.cos(x[2]),
-                          u[0] * math.sin(x[2]),
-                          u[1]], dtype=float)
     
     def obs_props(self):
         obs_centers = jnp.zeros(shape=(jnp.shape(self.r_obs)[0], 2),
@@ -90,13 +81,12 @@ class Env:
         
     
     def scene_sdf(self,
-                  points: ArrayLike,
                   centers: ArrayLike,
                   halfs: ArrayLike,
                   yaws: ArrayLike):
 
         per_obs = jax.vmap(fun=self.box_sdf,
-                           in_axes=(None, 0, 0, 0))(points, centers, halfs, yaws)
+                           in_axes=(None, 0, 0, 0))(self.grid_pts, centers, halfs, yaws)
         return jnp.min(per_obs, axis=0)
     
     def sdf_to_cost(self,
@@ -110,11 +100,10 @@ class Env:
     
 
     def in_fov(self,
-               points: ArrayLike,
                current_state: ArrayLike,
                cam_range: float,
                fov_deg: float):
-        rel = points - current_state[:2]
+        rel = self.grid_pts - current_state[:2]
         rng = jnp.linalg.norm(rel, axis=-1)
         bearing=jnp.arctan2(rel[:, 1], rel[:, 0])
         err = jnp.arctan2(jnp.sin(bearing - current_state[2]),
