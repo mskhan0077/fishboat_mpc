@@ -30,7 +30,6 @@ class P:
     unknown_cost = 0.001
 
 
-# ---- pure rollout (uses module constants, no env object -> jittable) ----
 def _rollout(x0, V):
     def f(x, cmd):
         nx = unicycle_ext(x, cmd, P.dt, P.tau_r, P.tau_u)   # FIX: dt supplied
@@ -52,7 +51,7 @@ def _mppi_step(x0, U_bar, G, key, goal, x0g, y0g, dxg, dyg):
     # FIX: vmap over 3 conceptual args reduced to 2 (env removed)
     pos = jax.vmap(_rollout, in_axes=(None, 0))(x0, V)
 
-    # costmap query (world -> fractional grid index -> bilinear sample)
+    # costmap query 
     cols = (pos[:, :, 0] - x0g) / dxg
     rows = (pos[:, :, 1] - y0g) / dyg
     coords = jnp.stack([rows.ravel(), cols.ravel()])
